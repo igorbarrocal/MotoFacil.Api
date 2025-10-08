@@ -6,6 +6,8 @@ using MotoFacilAPI.Infrastructure.Repositories;
 using MotoFacilAPI.Application.Interfaces;
 using MotoFacilAPI.Application.Services;
 using System.Reflection;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +41,23 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Health Checks
+builder.Services.AddHealthChecks();
+
+// Versionamento API
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+});
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
 // Configuração Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -67,5 +86,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.MapControllers();
+
+// Health Checks endpoint
+app.MapHealthChecks("/health");
 
 app.Run();

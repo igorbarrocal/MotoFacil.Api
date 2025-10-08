@@ -5,7 +5,8 @@ using MotoFacilAPI.Application.Interfaces;
 namespace MotoFacilAPI.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     public class UsuariosController : ControllerBase
     {
         private readonly IUsuarioService _service;
