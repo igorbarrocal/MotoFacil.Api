@@ -4,7 +4,7 @@
 **Disciplina:** *Advanced Business Development with .NET*  
 
 👤 **Autores**  
-- Igor Barrocal – RM555217  a
+- Igor Barrocal – RM555217  
 - Cauan da Cruz – RM558238  
 
 ---
@@ -31,6 +31,10 @@ A arquitetura segue os princípios de **Clean Architecture**, **Domain-Driven De
 - 🧩 **Paginação** nos endpoints de listagem (parâmetros `page`, `pageSize`, retorno `totalCount`)
 - 🔗 **HATEOAS** (links de navegação nos retornos das entidades)
 - 🔒 **Boas práticas REST**: status code adequado, payloads claros, uso correto dos verbos HTTP
+- 🚦 **Health Check**: pronto para monitoramento
+- 🛡️ **API segura com JWT**
+- 🤖 **Endpoint inteligente com ML.NET**
+- 🧪 **Testes automatizados unitários e integração**
 
 ---
 
@@ -51,37 +55,73 @@ src/
 - **Entity Framework Core**  
 - **Oracle** (configurável via *appsettings.json*)  
 - **Swagger/OpenAPI**  
+- **ML.NET**  
+- **xUnit**  
 
 ---
 
-## 📄 Endpoints Principais  
+## 🛡️ Autenticação JWT
 
-### 👥 Usuários  
-| Método | Endpoint        | Descrição            |  
-|--------|----------------|----------------------|  
-| GET    | `/usuarios`    | Listar todos os usuários (com paginação e HATEOAS) |  
-| GET    | `/usuarios/{id}` | Buscar usuário por ID (com HATEOAS) |  
-| POST   | `/usuarios`    | Criar novo usuário |  
-| PUT    | `/usuarios/{id}` | Atualizar usuário |  
-| DELETE | `/usuarios/{id}` | Remover usuário |  
+Antes de acessar os recursos protegidos, obtenha um token JWT:
 
-### 🏍️ Motos  
-| Método | Endpoint     | Descrição           |  
-|--------|-------------|---------------------|  
-| GET    | `/motos`    | Listar todas as motos (com paginação e HATEOAS) |  
-| GET    | `/motos/{id}` | Buscar moto por ID (com HATEOAS) |  
-| POST   | `/motos`    | Criar nova moto (modelo, vínculo ao usuário) |  
-| PUT    | `/motos/{id}` | Atualizar moto |  
-| DELETE | `/motos/{id}` | Remover moto |  
+**Requisição:**
+```json
+POST /api/v1/auth/login
+{
+  "email": "usuario@email.com",
+  "senha": "qualquer"
+}
+```
 
-### 🔧 Serviços  
-| Método | Endpoint        | Descrição            |  
-|--------|----------------|----------------------|  
-| GET    | `/servicos`    | Listar todos os serviços (com paginação e HATEOAS) |  
-| GET    | `/servicos/{id}` | Buscar serviço por ID (com HATEOAS) |  
-| POST   | `/servicos`    | Criar novo serviço (vinculado a uma moto e usuário) |  
-| PUT    | `/servicos/{id}` | Atualizar serviço (reagendar data, etc.) |  
-| DELETE | `/servicos/{id}` | Remover serviço |  
+**Resposta:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expiraEm": "2025-10-08T15:00:00Z"
+}
+```
+
+No Swagger, clique em **"Authorize"** e cole o token no formato:
+```
+Bearer {token}
+```
+Agora todos os endpoints protegidos ficarão disponíveis.
+
+---
+
+## 🚦 Health Check
+
+Verifique se a API está online:
+
+```http
+GET /health
+```
+Resposta esperada: **HTTP 200 OK**  
+Ideal para monitoramento (Kubernetes, Azure, etc).
+
+---
+
+## 🤖 Predição ML.NET
+
+Faça uma predição de necessidade de manutenção da moto:
+
+**Requisição:**
+```json
+POST /api/v1/ml/precisamanutencao
+{
+  "quilometragem": 15000,
+  "mesesDesdeUltimaRevisao": 14,
+  "numeroServicosUltimoAno": 2
+}
+```
+
+**Resposta:**
+```json
+{
+  "precisaManutencao": true,
+  "score": 0.92
+}
+```
 
 ---
 
@@ -169,8 +209,46 @@ https://localhost:7150/swagger
 
 ## 🧪 Testes
 
-Para rodar os testes (se houver):
+Para rodar todos os testes (unitários e integração):
+
 ```bash
 dotnet test
 ```
 
+### Exemplos de testes
+
+- Os testes cobrem os principais serviços de domínio (usuário, moto, serviço).
+- Testes de integração garantem que endpoints como `/health` e autenticação JWT funcionam de ponta a ponta.
+
+---
+
+## 📄 Endpoints Principais  
+
+### 👥 Usuários  
+| Método | Endpoint        | Descrição            |  
+|--------|----------------|----------------------|  
+| GET    | `/usuarios`    | Listar todos os usuários (com paginação e HATEOAS) |  
+| GET    | `/usuarios/{id}` | Buscar usuário por ID (com HATEOAS) |  
+| POST   | `/usuarios`    | Criar novo usuário |  
+| PUT    | `/usuarios/{id}` | Atualizar usuário |  
+| DELETE | `/usuarios/{id}` | Remover usuário |  
+
+### 🏍️ Motos  
+| Método | Endpoint     | Descrição           |  
+|--------|-------------|---------------------|  
+| GET    | `/motos`    | Listar todas as motos (com paginação e HATEOAS) |  
+| GET    | `/motos/{id}` | Buscar moto por ID (com HATEOAS) |  
+| POST   | `/motos`    | Criar nova moto (modelo, vínculo ao usuário) |  
+| PUT    | `/motos/{id}` | Atualizar moto |  
+| DELETE | `/motos/{id}` | Remover moto |  
+
+### 🔧 Serviços  
+| Método | Endpoint        | Descrição            |  
+|--------|----------------|----------------------|  
+| GET    | `/servicos`    | Listar todos os serviços (com paginação e HATEOAS) |  
+| GET    | `/servicos/{id}` | Buscar serviço por ID (com HATEOAS) |  
+| POST   | `/servicos`    | Criar novo serviço (vinculado a uma moto e usuário) |  
+| PUT    | `/servicos/{id}` | Atualizar serviço (reagendar data, etc.) |  
+| DELETE | `/servicos/{id}` | Remover serviço |  
+
+---
