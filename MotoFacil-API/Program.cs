@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-public partial class Program { }
+// REMOVA a declaração da classe Program do topo, coloque no final!
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,8 +57,8 @@ builder.Services.AddApiVersioning(options =>
     options.ReportApiVersions = true;
     options.ApiVersionReader = new UrlSegmentApiVersionReader();
 });
-// ATENÇÃO: Use somente AddApiExplorer() (não AddVersionedApiExplorer) na versão 8.x+
-builder.Services.AddApiExplorer();
+// REMOVA esta linha, pois está ERRADA para IServiceCollection:
+// builder.Services.AddApiExplorer();
 
 // JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -131,3 +131,6 @@ app.MapControllers();
 app.MapHealthChecks("/health");
 
 app.Run();
+
+// COLOQUE a partial class Program no final para testes de integração
+public partial class Program { }
