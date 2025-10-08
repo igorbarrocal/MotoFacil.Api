@@ -1,4 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Asp.Versioning;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using MotoFacilAPI.Application.Interfaces;
+using MotoFacilAPI.Application.Services;
+using MotoFacilAPI.Domain.Repositories;
+using MotoFacilAPI.Infrastructure.Persistence;
+using MotoFacilAPI.Infrastructure.Repositories;
+using System.Reflection;
+
+public partial class Program { }
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using MotoFacilAPI.Infrastructure.Persistence;
 using MotoFacilAPI.Domain.Repositories;
