@@ -7,22 +7,12 @@ using MotoFacilAPI.Domain.Repositories;
 using MotoFacilAPI.Infrastructure.Persistence;
 using MotoFacilAPI.Infrastructure.Repositories;
 using System.Reflection;
-
-public partial class Program { }
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using MotoFacilAPI.Infrastructure.Persistence;
-using MotoFacilAPI.Domain.Repositories;
-using MotoFacilAPI.Infrastructure.Repositories;
-using MotoFacilAPI.Application.Interfaces;
-using MotoFacilAPI.Application.Services;
-using System.Reflection;
-using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+
+public partial class Program { }
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,11 +57,8 @@ builder.Services.AddApiVersioning(options =>
     options.ReportApiVersions = true;
     options.ApiVersionReader = new UrlSegmentApiVersionReader();
 });
-builder.Services.AddVersionedApiExplorer(options =>
-{
-    options.GroupNameFormat = "'v'VVV";
-    options.SubstituteApiVersionInUrl = true;
-});
+// ATENÇÃO: Use somente AddApiExplorer() (não AddVersionedApiExplorer) na versão 8.x+
+builder.Services.AddApiExplorer();
 
 // JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
