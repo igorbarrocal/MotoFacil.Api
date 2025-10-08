@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36109.1 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MotoFacil-API", "MotoFacil-API\MotoFacil-API.csproj", "{9F238361-4DD9-4BA9-AF9D-6C6DEB6336C8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9F238361-4DD9-4BA9-AF9D-6C6DEB6336C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F238361-4DD9-4BA9-AF9D-6C6DEB6336C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F238361-4DD9-4BA9-AF9D-6C6DEB6336C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F238361-4DD9-4BA9-AF9D-6C6DEB6336C8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {874298DA-C384-4A16-A221-2FA7AFEA346D}
+	EndGlobalSection
+EndGlobal
