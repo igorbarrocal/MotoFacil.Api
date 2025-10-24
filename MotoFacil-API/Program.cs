@@ -12,8 +12,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-// REMOVA a declaração da classe Program do topo, coloque no final!
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Conexão Oracle definida em appsettings.json
@@ -57,8 +55,6 @@ builder.Services.AddApiVersioning(options =>
     options.ReportApiVersions = true;
     options.ApiVersionReader = new UrlSegmentApiVersionReader();
 });
-// REMOVA esta linha, pois está ERRADA para IServiceCollection:
-// builder.Services.AddApiExplorer();
 
 // JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -87,14 +83,15 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API para gerenciamento de usuários, motos e serviços no sistema MotoFácil"
     });
 
-    // JWT Bearer config para Swagger
+    // JWT Bearer config para Swagger — usa SecuritySchemeType.Http com bearer (melhor UX)
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header usando o esquema Bearer. Exemplo: \"Authorization: Bearer {token}\"",
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement{
         {
@@ -102,7 +99,10 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference{
                     Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
-                }
+                },
+                Scheme = "bearer",
+                Name = "Bearer",
+                In = ParameterLocation.Header
             },
             new string[]{}
         }
@@ -123,7 +123,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MotoFacil API v1");
+});
 
 app.MapControllers();
 
@@ -132,5 +135,5 @@ app.MapHealthChecks("/health");
 
 app.Run();
 
-// COLOQUE a partial class Program no final para testes de integração
+// partial class Program para testes de integração
 public partial class Program { }

@@ -1,5 +1,4 @@
 ﻿using MotoFacilAPI.Domain.ValueObjects;
-using MotoFacilAPI.Domain.Entities;
 
 namespace MotoFacilAPI.Domain.Entities
 {
@@ -10,17 +9,23 @@ namespace MotoFacilAPI.Domain.Entities
     {
         public int Id { get; private set; }
         public string Nome { get; private set; } = string.Empty;
-        public Email Email { get; private set; } // Value Object
+
+        // Inicializa com null! para satisfazer o compilador/nullable checks e
+        // manter a invariância via construtor público. EF Core usa o ctor privado.
+        public Email Email { get; private set; } = null!; // Value Object
 
         // Navegação: um usuário pode ter várias motos
         public List<Moto> Motos { get; private set; } = new();
 
-        private Usuario() { } // EF Core
+        private Usuario() 
+        { 
+            // ctor para EF Core — Email já inicializado com null! acima
+        } // EF Core
 
         public Usuario(string nome, Email email)
         {
             AlterarNome(nome);
-            Email = email;
+            Email = email ?? throw new ArgumentNullException(nameof(email), "Email obrigatório");
         }
 
         public void AlterarNome(string nome)
