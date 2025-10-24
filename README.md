@@ -22,19 +22,19 @@ A arquitetura segue os princípios de **Clean Architecture**, **Domain-Driven De
 
 ## ⚙️ Funcionalidades  
 
-- 👥 **Gerenciamento de Usuários** (CRUD completo, entidade rica, Value Object para e-mail)
-- 🏍️ **Gerenciamento de Motos** (CRUD completo, incluindo vínculo com usuário, enum para modelo da moto: `MottuSport`, `MottuE`, `MottuPop`)
-- 🔧 **Gerenciamento de Serviços** realizados nas motos (CRUD completo, regras de reagendamento)
-- 📦 **Validação de dados** via DTOs e entidades
-- 📑 **Documentação interativa** com Swagger/OpenAPI (descrição de endpoints, parâmetros e exemplos)
-- 🗄️ **Persistência de dados** com Entity Framework Core + Migrations
-- 🧩 **Paginação** nos endpoints de listagem (parâmetros `page`, `pageSize`, retorno `totalCount`)
-- 🔗 **HATEOAS** (links de navegação nos retornos das entidades)
-- 🔒 **Boas práticas REST**: status code adequado, payloads claros, uso correto dos verbos HTTP
-- 🚦 **Health Check**: pronto para monitoramento
-- 🛡️ **API segura com JWT**
-- 🤖 **Endpoint inteligente com ML.NET**
-- 🧪 **Testes automatizados unitários e integração**
+- 👥 **Gerenciamento de Usuários** (CRUD completo, entidade rica, Value Object para e-mail)  
+- 🏍️ **Gerenciamento de Motos** (CRUD completo, incluindo vínculo com usuário, enum para modelo da moto: `MottuSport`, `MottuE`, `MottuPop`)  
+- 🔧 **Gerenciamento de Serviços** realizados nas motos (CRUD completo, regras de reagendamento)  
+- 📦 **Validação de dados** via DTOs e entidades  
+- 📑 **Documentação interativa** com Swagger/OpenAPI (descrição de endpoints, parâmetros e exemplos)  
+- 🗄️ **Persistência de dados** com Entity Framework Core + Migrations  
+- 🧩 **Paginação** nos endpoints de listagem (parâmetros `page`, `pageSize`, retorno `totalCount`)  
+- 🔗 **HATEOAS** (links de navegação nos retornos das entidades)  
+- 🔒 **Boas práticas REST**: status code adequado, payloads claros, uso correto dos verbos HTTP  
+- 🚦 **Health Check**: pronto para monitoramento (`GET /health`)  
+- 🛡️ **API segura com JWT**  
+- 🤖 **Endpoint inteligente com ML.NET** (`POST /api/v1/ml/precisamanutencao`)  
+- 🧪 **Testes automatizados unitários e integração (xUnit + WebApplicationFactory)**
 
 ---
 
@@ -65,8 +65,10 @@ src/
 Antes de acessar os recursos protegidos, obtenha um token JWT:
 
 **Requisição:**
-```json
+```http
 POST /api/v1/auth/login
+Content-Type: application/json
+
 {
   "email": "usuario@email.com",
   "senha": "qualquer"
@@ -96,8 +98,7 @@ Verifique se a API está online:
 ```http
 GET /health
 ```
-Resposta esperada: **HTTP 200 OK**  
-Ideal para monitoramento (Kubernetes, Azure, etc).
+Resposta esperada: **HTTP 200 OK** — ideal para monitoramento (Kubernetes, Azure, etc).
 
 ---
 
@@ -106,8 +107,10 @@ Ideal para monitoramento (Kubernetes, Azure, etc).
 Faça uma predição de necessidade de manutenção da moto:
 
 **Requisição:**
-```json
+```http
 POST /api/v1/ml/precisamanutencao
+Content-Type: application/json
+
 {
   "quilometragem": 15000,
   "mesesDesdeUltimaRevisao": 14,
@@ -123,14 +126,17 @@ POST /api/v1/ml/precisamanutencao
 }
 ```
 
+> Observação: atualmente a lógica usa um modelo "dummy" (regra simples) implementado com ML.NET — pronto para trocar por um modelo treinado posteriormente.
+
 ---
 
 ## 📝 Exemplos de Payloads  
 
 ### Criar Usuário
+```http
+POST /api/v1/usuarios
+Content-Type: application/json
 
-```json
-POST /usuarios
 {
   "nome": "João Silva",
   "email": "joao@email.com"
@@ -138,9 +144,10 @@ POST /usuarios
 ```
 
 ### Criar Moto
+```http
+POST /api/v1/motos
+Content-Type: application/json
 
-```json
-POST /motos
 {
   "placa": "ABC1234",
   "modelo": "MottuSport",
@@ -148,12 +155,11 @@ POST /motos
 }
 ```
 
-> Modelos válidos: `"MottuSport"`, `"MottuE"`, `"MottuPop"`
-
 ### Criar Serviço
+```http
+POST /api/v1/servicos
+Content-Type: application/json
 
-```json
-POST /servicos
 {
   "descricao": "Troca de óleo",
   "data": "2025-09-25T14:00:00Z",
@@ -161,13 +167,6 @@ POST /servicos
   "motoId": 1
 }
 ```
-
----
-
-## 📝 Modelos dos Dados (Swagger/OpenAPI)  
-
-Todos os endpoints têm modelos de dados detalhados, exemplos de payloads de requisição e resposta, e parâmetros descritos no Swagger.  
-- Acesse [https://localhost:7150/swagger](https://localhost:7150/swagger) após rodar a API.
 
 ---
 
@@ -190,6 +189,8 @@ Por padrão, está configurado para Oracle:
 ```
 Altere conforme seu ambiente.
 
+> Se não quiser usar Oracle localmente para desenvolvimento/testes, pode trocar o provider (ex.: SQLite/InMemory) no Startup/Program para facilitar execução.
+
 ### 3️⃣ Execute as migrations  
 ```bash
 dotnet ef database update
@@ -197,7 +198,7 @@ dotnet ef database update
 
 ### 4️⃣ Rode a API  
 ```bash
-dotnet run
+dotnet run --project MotoFacil-API/MotoFacil-API.csproj
 ```
 
 Acesse o Swagger em:  
@@ -215,40 +216,88 @@ Para rodar todos os testes (unitários e integração):
 dotnet test
 ```
 
-### Exemplos de testes
+Comandos úteis:
+- Restaurar pacotes: dotnet restore
+- Compilar: dotnet build
+- Rodar testes de um projeto específico: dotnet test MotoFacilAPI.Tests
 
-- Os testes cobrem os principais serviços de domínio (usuário, moto, serviço).
-- Testes de integração garantem que endpoints como `/health` e autenticação JWT funcionam de ponta a ponta.
+### Testes de integração
+- Os testes usam WebApplicationFactory<Program> (Program parcial) para testar endpoints como `/health`.
+
+### Testes unitários
+- xUnit + Moq são usados para testes de serviços.  
+- Importante: alguns mocks precisam retornar uma Task quando métodos assíncronos são mockados (ex.: AddAsync). Se você tiver um mock que apenas faz Callback, adicione também .Returns(Task.CompletedTask) para evitar await em null.
+
+Exemplo corrigido do teste problemático (MotoServiceTests):
+```csharp
+mockRepo.Setup(r => r.AddAsync(It.IsAny<Moto>()))
+    .Callback<Moto>(m => m.GetType().GetProperty("Id")!.SetValue(m, 123))
+    .Returns(Task.CompletedTask);
+```
 
 ---
 
-## 📄 Endpoints Principais  
+## ⚠️ Avisos conhecidos / Como solucionar problemas de NuGet
+
+- NU1603 (ex.: Microsoft.AspNetCore.Mvc.Testing >= 8.0.9) — geralmente ocorre quando NuGet resolve uma patch diferente. Para eliminar o aviso, alinhe a versão no csproj para a versão efetivamente resolvida (ex.: 8.0.10) ou use uma faixa de versão compatível.
+
+- NU1901 — vulnerabilidade reportada em um pacote (ex.: Moq). Recomendações:
+  1. Liste pacotes vulneráveis:
+     ```bash
+     dotnet list package --vulnerable
+     ```
+  2. Atualize o pacote para uma versão corrigida (se houver):
+     ```bash
+     dotnet add MotoFacilAPI.Tests package Moq --version <versao-corrigida>
+     ```
+     ou
+     ```bash
+     dotnet add MotoFacilAPI.Tests package NSubstitute
+     ```
+     (caso deseje migrar de framework de mocking)
+  3. Depois, rode:
+     ```bash
+     dotnet restore
+     dotnet build
+     dotnet test
+     ```
+  4. Se sua CI falhar por políticas de segurança, escolha uma versão sem advisory ou altere a biblioteca de mocking.
+
+- Se o projeto não compilar:
+  - Confira TargetFramework (net8.0) e versões de pacotes (compatíveis com .NET 8).
+  - Verifique se o projeto de testes referencia corretamente o projeto principal no csproj.
+
+---
+
+## 📄 Endpoints Principais (resumo)  
+
+Base: /api/v1
 
 ### 👥 Usuários  
-| Método | Endpoint        | Descrição            |  
-|--------|----------------|----------------------|  
-| GET    | `/usuarios`    | Listar todos os usuários (com paginação e HATEOAS) |  
-| GET    | `/usuarios/{id}` | Buscar usuário por ID (com HATEOAS) |  
-| POST   | `/usuarios`    | Criar novo usuário |  
-| PUT    | `/usuarios/{id}` | Atualizar usuário |  
-| DELETE | `/usuarios/{id}` | Remover usuário |  
+- GET /usuarios  
+- GET /usuarios/{id}  
+- POST /usuarios  
+- PUT /usuarios/{id}  
+- DELETE /usuarios/{id}  
 
 ### 🏍️ Motos  
-| Método | Endpoint     | Descrição           |  
-|--------|-------------|---------------------|  
-| GET    | `/motos`    | Listar todas as motos (com paginação e HATEOAS) |  
-| GET    | `/motos/{id}` | Buscar moto por ID (com HATEOAS) |  
-| POST   | `/motos`    | Criar nova moto (modelo, vínculo ao usuário) |  
-| PUT    | `/motos/{id}` | Atualizar moto |  
-| DELETE | `/motos/{id}` | Remover moto |  
+- GET /motos  
+- GET /motos/{id}  
+- POST /motos  
+- PUT /motos/{id}  
+- DELETE /motos/{id}  
 
 ### 🔧 Serviços  
-| Método | Endpoint        | Descrição            |  
-|--------|----------------|----------------------|  
-| GET    | `/servicos`    | Listar todos os serviços (com paginação e HATEOAS) |  
-| GET    | `/servicos/{id}` | Buscar serviço por ID (com HATEOAS) |  
-| POST   | `/servicos`    | Criar novo serviço (vinculado a uma moto e usuário) |  
-| PUT    | `/servicos/{id}` | Atualizar serviço (reagendar data, etc.) |  
-| DELETE | `/servicos/{id}` | Remover serviço |  
+- GET /servicos  
+- GET /servicos/{id}  
+- POST /servicos  
+- PUT /servicos/{id}  
+- DELETE /servicos/{id}  
 
----
+### 🤖 ML  
+- POST /ml/precisamanutencao
+
+
+- Atualização (ou sugestão) de versão do Moq para eliminar o alerta NU1901, ou migração para NSubstitute.
+
+Quer que eu crie o PR com essas mudanças apontando para a branch `main`?
